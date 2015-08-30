@@ -3,12 +3,15 @@ package org.xiangbalao.viedio;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.xiangbalao.viedio.frame.RapidlyLoanInfoContents;
+import org.xiangbalao.viedio.frame.Config4VideoUtils;
 import org.xiangbalao.viedio.frame.VideoUtils;
 import org.xiangbalao.viedio.ui.ImageAdapter;
+import org.xiangbalao.viedio.utils.BitmapUtil;
+import org.xiangbalao.viedio.utils.Utils;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +24,7 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
+import de.greenrobot.event.EventBus;
 
 public class MainActivity extends Activity implements OnClickListener {
 
@@ -43,17 +47,23 @@ public class MainActivity extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		EventBus.getDefault().register(this);
 		getPath();
 
 		if (!Utils.checkFileExists(videoPath)) {
 			Utils mUtils = new Utils(this);
+			//将备用文件拷到SD卡
 			mUtils.copyFile("videoviewdemo.mp4", videoPath);
 
+		}else {
+			initView();
 		}
 
-		initView();
+	}
 
+	public void onEventMainThread(String event) {
+
+		initView();
 	}
 
 	private void initView() {
@@ -97,8 +107,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	private void getPath() {
-		videoPath = RapidlyLoanInfoContents.videoPath;
-		potoPath = RapidlyLoanInfoContents.potoPath;
+		videoPath = Config4VideoUtils.videoPath;
+		potoPath = Config4VideoUtils.potoPath;
 
 	}
 
@@ -140,8 +150,17 @@ public class MainActivity extends Activity implements OnClickListener {
 			VideoUtils mVideoUtils = new VideoUtils();
 			// 获取帧
 			String potop = mVideoUtils.getFrams(videoPath, potoPath, 5);
-			image.setImageURI(Uri.parse(potop));
 
+			Bitmap mBitmap = BitmapFactory.decodeFile(potop);
+
+			// image.setImageURI(Uri.parse(potop));
+
+			// image.setImageBitmap(BitmapUtil.rotateBitMap(mBitmap, potop, 8));
+			// 旋转图片
+			String pathString = BitmapUtil.saveBitmap(
+					BitmapUtil.rotateBitMap(mBitmap, potop, 8), potop);
+
+			image.setImageURI(Uri.parse(pathString));
 			break;
 		default:
 			break;

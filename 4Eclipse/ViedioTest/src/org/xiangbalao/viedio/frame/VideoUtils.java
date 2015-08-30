@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.xiangbalao.viedio.utils.BitmapUtil;
+
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.media.MediaMetadataRetriever;
@@ -72,6 +75,9 @@ public class VideoUtils {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		
+	
 
 		return path;
 
